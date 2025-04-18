@@ -63,7 +63,10 @@ const updateManager = async (req, res) => {
 // DELETE manager
 const deleteManager = async (req, res) => {
   const { managerId } = req.params;
-  const deleted = await User.findOneAndDelete({ _id: managerId, role: "manager" });
+  const deleted = await User.findOneAndDelete({
+    _id: managerId,
+    role: "manager",
+  });
   if (!deleted) return res.status(404).json({ message: "Manager not found" });
   res.json({ message: "Manager deleted" });
 };
@@ -126,14 +129,15 @@ const getDashboardStats = async (req, res) => {
       },
     ]);
 
-    // Convert to a keyed object
     const result = {
+      total: 0,
       inProgress: 0,
       completed: 0,
       canceled: 0,
     };
 
     stats.forEach((stat) => {
+      result.total += stat.count;
       switch (stat._id) {
         case "IN_PROGRESS":
           result.inProgress = stat.count;
@@ -143,8 +147,6 @@ const getDashboardStats = async (req, res) => {
           break;
         case "CANCELED":
           result.canceled = stat.count;
-          break;
-        default:
           break;
       }
     });

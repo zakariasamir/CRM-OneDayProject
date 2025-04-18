@@ -47,13 +47,12 @@ export const login = async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        // sameSite: "None",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         maxAge: parseInt(JWT_EXPIRATION) * 60 * 60 * 1000,
       })
       .json({
         message: "Login Successful",
-        token,
         user: {
           _id: user._id,
           name: user.name,
@@ -70,6 +69,31 @@ export const login = async (req, res) => {
       ]);
   }
 };
+
+export const fetchCurrentUser = async (req, res) => {
+  try {
+    console.log("Fetching current user" , req.cookies.token);
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    return res
+      .status(500)
+      .json([
+        { error: "Internal server error" },
+        { message: `Error fetching current user: ${error.message}` },
+      ]);
+  }
+}
 
 export const logout = async (req, res) => {
   try {

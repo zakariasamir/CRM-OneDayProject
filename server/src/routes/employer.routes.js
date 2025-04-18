@@ -1,6 +1,16 @@
 import { Router } from "express";
 const router = Router();
-import { getManagers, createManager, updateManager, deleteManager, getLeads, createLead, updateLead, deleteLead } from "../controllers/employer.controller.js";
+import {
+  getManagers,
+  createManager,
+  updateManager,
+  deleteManager,
+  getLeads,
+  createLead,
+  updateLead,
+  deleteLead,
+  getDashboardStats,
+} from "../controllers/employer.controller.js";
 import authenticate from "../middlewares/auth.js";
 import authorize from "../middlewares/role.js";
 
@@ -8,6 +18,7 @@ import authorize from "../middlewares/role.js";
 const authEmployer = [authenticate, authorize("employer")];
 
 // Managers
+router.get("/dashboard/stats", authEmployer, getDashboardStats);
 router.get("/managers", authEmployer, getManagers);
 router.post("/managers", authEmployer, createManager);
 router.put("/managers/:managerId", authEmployer, updateManager);

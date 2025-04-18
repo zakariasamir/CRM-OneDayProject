@@ -3,13 +3,13 @@ const { verify } = pkg;
 const { JWT_SECRET } = process.env;
 
 const authenticate = (req, res, next) => {
-  if (!req.cookies && !req.headers["authorization"]) {
+  if (!req.cookies) {
     return res.status(401).json({
       success: false,
       message: "Access denied. No cookies available.",
     });
   }
-  const token = req.headers["authorization"].split(" ")[1];
+  const token = req.cookies.token;
 
   if (!token) {
     console.log("No token found in cookies");
